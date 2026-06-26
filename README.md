@@ -1,5 +1,11 @@
 # Lunaria - Avance Semana 6
 
+## Repositorio del proyecto
+
+El código fuente del proyecto se encuentra disponible en el siguiente enlace:
+
+[Ver repositorio en GitHub](https://github.com/FridaNevi/Lunaria)
+
 ## Construccion del Observatorio: estructura RAG, prompt, recomendaciones y enums
 
 ## 1. Descripcion general
