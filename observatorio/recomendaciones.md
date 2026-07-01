@@ -36,6 +36,24 @@ Fase: luna_menguante
 Estado de ánimo: cansancio, nostalgia, introspección.
 Descripción: Música para bajar la velocidad, pensar demasiado y fingir que ordenar tu cuarto también ordena tu destino.
 
+### Canciones para caminar como protagonista secundaria
+Autor: Lunaria
+Tipo: music
+Modo: frecuencia
+Fase: cuarto_creciente
+Estado de ánimo: cuando necesitas moverte, pero todavía no quieres hablar con nadie.
+Descripción: Una señal musical para salir del estancamiento sin convertir el momento en discurso motivacional.
+
+## Chisme
+
+### El chisme detras de una obra
+Autor: Lunaria
+Tipo: culture
+Modo: chisme
+Fase: luna_llena
+Estado de ánimo: curiosidad, ganas de contexto o necesidad de entender por qué algo importa.
+Descripción: Recomendación para cuando el usuario no solo quiere consumir una obra, sino saber qué historia, tensión o dato cultural la rodea.
+
 ## Eclipse
 
 ### Kit de supervivencia para eclipse emocional
@@ -45,3 +63,13 @@ Modo: eclipse
 Fase: eclipse
 Estado de ánimo: bloqueo, tristeza, confusión o saturación.
 Descripción: Recomendación para usuarios que no necesitan motivación intensa, sino algo suave, específico y soportable para atravesar el momento.
+
+## Caos
+
+### Ruleta de caos lunar
+Autor: Lunaria
+Tipo: chaos
+Modo: caos
+Fase: luna_nueva
+Estado de ánimo: aburrimiento, curiosidad rara o ganas de recibir algo inesperado.
+Descripción: Una recomendación libre para mezclar lectura, música o contexto cultural sin obedecer demasiado a una categoría.

@@ -1,145 +1,155 @@
-# Lunaria - Avance Semana 6
+# Lunaria - Avance Semana 7
 
 ## Repositorio del proyecto
 
-El código fuente del proyecto se encuentra disponible en el siguiente enlace:
+El codigo fuente del proyecto se encuentra disponible en el siguiente enlace:
 
 [Ver repositorio en GitHub](https://github.com/FridaNevi/Lunaria)
 
-## Construccion del Observatorio: estructura RAG, prompt, recomendaciones y enums
+## Del Observatorio conceptual a una primera recuperacion funcional
 
 ## 1. Descripcion general
 
-Este avance corresponde a la semana 6 del proyecto Lunaria. Despues de haber trabajado previamente en el prototipo conversacional y en la identidad visual del personaje, esta etapa se enfoco en comenzar la estructura tecnica que permitira que Lunaria funcione como una asistente RAG con una personalidad propia, modos conversacionales y una base de recomendaciones curada.
+Este avance corresponde a la semana 7 del proyecto Lunaria. En la semana anterior se habia definido la estructura base del sistema RAG: el Observatorio, el prompt, los modos conversacionales y los enums principales.
 
-El objetivo principal de este avance no fue construir una version final del sistema, sino definir las bases del proyecto para que Lunaria pueda evolucionar de un chatbot con personalidad a una experiencia conversacional mas completa, capaz de consultar su propio Observatorio antes de responder.
+Durante esta semana el objetivo fue pasar de una estructura conceptual a una primera version funcional. Lunaria ya no solo carga archivos del proyecto, sino que puede leer el Observatorio, convertir sus recomendaciones en datos organizados, buscar coincidencias segun el mensaje del usuario y construir una respuesta de prueba usando esa informacion.
 
-En esta etapa se trabajaron tres componentes principales:
+Todavia no se implemento una base vectorial con embeddings. Esta semana se trabajo una recuperacion local sencilla, suficiente para probar el flujo antes de agregar mas complejidad.
 
-* La estructura inicial del proyecto.
-* El diseno del prompt base de Lunaria.
-* La creacion de una primera base de recomendaciones.
-* La definicion de enums para organizar modos, fases lunares, rutas y tipos de contenido.
+## 2. Objetivo de la semana 7
 
-## 2. Contexto del avance
-
-En semanas anteriores, Lunaria ya habia sido definida como personaje y como propuesta visual. La semana 4 permitio comprobar que era posible hacerla responder usando Chainlit y Groq. La semana 5 se enfoco en presentar su identidad visual.
-
-La semana 6 parte de esa base y busca responder una nueva pregunta:
+La pregunta principal de esta etapa fue:
 
 ```txt
-Como puede Lunaria empezar a tener una memoria curada propia?
+Como puede Lunaria empezar a recuperar informacion real de su Observatorio?
 ```
 
-Para responder esto, se planteo una version mas estructurada del sistema. En lugar de depender unicamente del conocimiento general del modelo de lenguaje, Lunaria comenzara a consultar una base de recomendaciones llamada Observatorio.
+Para responderla, se trabajaron cuatro avances:
 
-El Observatorio funcionara como una fuente de conocimiento interna donde se almacenaran libros, canciones, playlists, datos culturales y recomendaciones emocionales organizadas segun los modos de conversacion de Lunaria.
+* Convertir las recomendaciones del Observatorio en objetos estructurados.
+* Crear una busqueda local por palabras clave, modo y contenido.
+* Simular una respuesta de Lunaria usando recomendaciones recuperadas.
+* Actualizar el README para documentar el estado real del proyecto al cierre de la semana 7.
 
-## 3. Concepto del Observatorio
+## 3. Avances tecnicos implementados
 
-El Observatorio es la base de conocimiento curada de Lunaria.
+### 3.1 Lectura del Observatorio
 
-Su funcion es guardar recomendaciones que la asistente pueda consultar antes de responder. Esto permite que Lunaria no invente recomendaciones de forma aleatoria, sino que base sus respuestas en una seleccion previamente definida y coherente con su personalidad.
+El archivo `ingest.py` ahora mantiene la funcion para leer `observatorio/recomendaciones.md`, pero ya no se queda solamente con el texto completo.
 
-El Observatorio no se plantea como una base de datos fria, sino como una coleccion organizada de senales, lecturas, canciones y referencias culturales.
+La funcion `load_recommendations()` carga el Markdown, separa cada recomendacion y la convierte en una estructura que Python puede usar mejor.
 
-Ejemplo conceptual:
+Esto importa porque el sistema deja de tratar el Observatorio como una hoja de texto gigante y empieza a verlo como una coleccion de recomendaciones con campos.
 
-```txt
-Observatorio
-|- Biblioteca
-|  |- Libros recomendados
-|- Frecuencia
-|  |- Musica y playlists
-|- Chisme
-|  |- Datos culturales y contexto
-|- Eclipse
-|  |- Recomendaciones emocionales
-|- Caos
-   |- Recomendaciones inesperadas
-```
+### 3.2 Parsing de recomendaciones
 
-Esta estructura permite que Lunaria responda de acuerdo con el estado emocional o intencion del usuario.
+Se agrego la funcion `parse_recommendation()`.
 
-## 4. Modos conversacionales
-
-Se definieron cinco modos principales para organizar la personalidad y las respuestas de Lunaria.
-
-### Biblioteca
-
-Modo enfocado en libros, lectura, autores e historias. Se activa cuando el usuario busca una recomendacion literaria o expresa ganas de leer algo.
-
-### Frecuencia
-
-Modo enfocado en musica, canciones, artistas o playlists. Se activa cuando el usuario busca acompanamiento sonoro para un momento especifico.
-
-### Chisme
-
-Modo enfocado en contexto cultural, datos curiosos, autores, artistas o historias detras de obras. Permite que Lunaria explique detalles culturales con un tono mas casual.
-
-### Eclipse
-
-Modo enfocado en momentos emocionalmente densos: tristeza, bloqueo, cansancio, confusion o crisis creativa. No busca motivar de forma exagerada, sino acompanar con recomendaciones suaves y especificas.
-
-### Caos
-
-Modo mas libre, inesperado y experimental. Sirve para recomendaciones raras, combinaciones poco obvias o respuestas mas espontaneas.
-
-## 5. Pensamiento detras del prompt
-
-El prompt de Lunaria se penso como una traduccion tecnica de su identidad de personaje.
-
-No se trata unicamente de decirle al modelo "responde bonito", sino de definir reglas claras sobre como debe comportarse, que tono debe usar, que limites debe respetar y como debe integrar la informacion recuperada del Observatorio.
-
-El prompt se construyo considerando cuatro necesidades:
-
-1. Mantener la personalidad de Lunaria.
-2. Responder siempre en espanol.
-3. Evitar que el modelo invente recomendaciones.
-4. Integrar los modos conversacionales dentro de una logica clara.
-
-## 6. Primera base de recomendaciones
-
-Para comenzar el Observatorio, se planteo una primera base de recomendaciones en formato Markdown.
-
-El objetivo de usar Markdown es que sea facil de escribir, leer y modificar sin necesidad de una base de datos compleja desde el inicio.
-
-Cada recomendacion incluye metadata basica:
+Su trabajo es tomar un bloque como este:
 
 ```txt
 Titulo
 Autor
 Tipo
 Modo
-Fase lunar
+Fase
 Estado de animo
 Descripcion
 ```
 
-Esta metadata permitira que, mas adelante, el sistema pueda recuperar recomendaciones de forma mas precisa segun lo que el usuario escriba.
+Y convertirlo en una recomendacion estructurada.
 
-## 7. Uso de enums
+Segun mi forma de entenderlo, este paso es como ordenar una libreta: el contenido ya existia, pero ahora cada dato tiene su lugar y puede ser encontrado con mas facilidad.
 
-Se decidio utilizar enums para evitar depender de textos escritos manualmente dentro del codigo.
+### 3.3 Modelo de datos Recommendation
 
-Los enums ayudan a controlar valores fijos como modos, fases lunares, tipos de recomendacion y rutas del sistema.
+En `lunaria_types.py` se agrego una clase `Recommendation`.
 
-Por ejemplo:
+Esta clase guarda los campos principales de cada recomendacion:
 
-```python
-class LunariaMode(str, Enum):
-    BIBLIOTECA = "biblioteca"
-    FRECUENCIA = "frecuencia"
-    CHISME = "chisme"
-    ECLIPSE = "eclipse"
-    CAOS = "caos"
+* `title`
+* `author`
+* `content_type`
+* `mode`
+* `phases`
+* `mood`
+* `description`
+
+Tambien incluye el metodo `as_context()`, que convierte la recomendacion en texto legible para que pueda usarse como contexto en el flujo RAG.
+
+Esto ayuda a separar dos cosas:
+
+* El Observatorio como archivo Markdown editable.
+* Las recomendaciones como datos internos que Lunaria puede consultar.
+
+### 3.4 Deteccion sencilla de modo
+
+En `rag.py` se agrego `detect_mode()`.
+
+Esta funcion revisa el mensaje del usuario y busca palabras relacionadas con los modos de Lunaria:
+
+* Biblioteca: leer, libro, novela, autor.
+* Frecuencia: musica, cancion, playlist.
+* Chisme: chisme, contexto, dato curioso.
+* Eclipse: triste, cansada, bloqueo, confusion.
+* Caos: raro, inesperado, caos, sorprendeme.
+
+No es una deteccion perfecta, pero sirve como primera version para probar el comportamiento del sistema sin depender todavia de un modelo externo.
+
+### 3.5 Recuperacion local de recomendaciones
+
+Tambien se agrego `retrieve_recommendations()`.
+
+Esta funcion representa el primer intento real del RAG:
+
+```txt
+Mensaje del usuario
+|
+Detectar posible modo
+|
+Comparar contra recomendaciones del Observatorio
+|
+Ordenar por coincidencia
+|
+Regresar las mejores senales encontradas
 ```
 
-El uso de enums no busca mejorar directamente la velocidad del sistema, sino su mantenibilidad. Ayuda a que las rutas y categorias esten controladas y evita errores por escribir mal una palabra.
+La busqueda suma puntos cuando el mensaje coincide con el modo, el titulo, la fase, el estado de animo o la descripcion de una recomendacion.
 
-## 8. Estructura propuesta del proyecto
+Aunque no usa embeddings, ya permite probar el flujo completo de recuperacion.
 
-La estructura inicial propuesta para esta etapa es la siguiente:
+## 4. Respuesta de prueba de Lunaria
+
+La funcion `answer_with_lunaria()` tambien evoluciono.
+
+Antes solo cargaba el prompt y mostraba un placeholder. Ahora:
+
+1. Carga el prompt del sistema.
+2. Recupera recomendaciones del Observatorio.
+3. Construye contexto tecnico con el mensaje del usuario y la informacion recuperada.
+4. Genera una respuesta simulada de Lunaria.
+
+La respuesta todavia no viene de un modelo de lenguaje conectado. Es una respuesta armada desde Python para comprobar que la recuperacion funciona.
+
+Esto es importante porque permite validar la logica antes de conectar Groq, Chainlit o una base vectorial.
+
+## 5. Ampliacion del Observatorio
+
+El archivo `observatorio/recomendaciones.md` tambien se amplio.
+
+Ahora el Observatorio incluye senales para los cinco modos principales:
+
+* Biblioteca
+* Frecuencia
+* Chisme
+* Eclipse
+* Caos
+
+Esto permite probar que la deteccion de modo no se quede limitada solo a libros o apoyo emocional.
+
+## 6. Estructura actual del proyecto
+
+La estructura del proyecto al cierre de la semana 7 queda asi:
 
 ```txt
 LunariaRAG/
@@ -147,86 +157,140 @@ LunariaRAG/
 |- ingest.py
 |- rag.py
 |- lunaria_types.py
-|- .env
 |- requirements.txt
+|- README.md
 |- observatorio/
 |  |- recomendaciones.md
 |- prompts/
    |- lunaria_system.txt
 ```
 
+## 7. Explicacion de archivos
+
 ### app.py
 
-Archivo principal de la interfaz conversacional con Chainlit.
+Es el punto de entrada de prueba.
+
+Por ahora no levanta Chainlit. Sirve para ejecutar un mensaje de ejemplo y revisar en consola si Lunaria recupera informacion del Observatorio.
 
 ### ingest.py
 
-Archivo encargado de leer el Observatorio, separar recomendaciones, generar embeddings y guardarlos en una base vectorial.
+Lee el Observatorio, separa recomendaciones y las convierte en objetos `Recommendation`.
+
+Este archivo representa la preparacion de datos.
 
 ### rag.py
 
-Archivo encargado de recibir preguntas, buscar informacion relevante en el Observatorio y generar una respuesta usando el modelo de lenguaje.
+Contiene la logica principal del flujo RAG provisional:
+
+* Cargar el prompt.
+* Detectar modo.
+* Puntuar recomendaciones.
+* Recuperar coincidencias.
+* Armar una respuesta de prueba.
 
 ### lunaria_types.py
 
-Archivo donde se definen enums y tipos base del sistema.
+Guarda enums y estructuras compartidas:
+
+* Modos conversacionales.
+* Fases lunares simbolicas.
+* Tipos de recomendacion.
+* Rutas del proyecto.
+* Clase `Recommendation`.
 
 ### observatorio/recomendaciones.md
 
-Primera base de recomendaciones curadas de Lunaria.
+Es la base de conocimiento curada de Lunaria.
+
+Se mantiene en Markdown porque todavia es facil de editar, leer y ampliar sin necesitar una base de datos real.
 
 ### prompts/lunaria_system.txt
 
-Prompt base que define la personalidad y reglas de respuesta de Lunaria.
+Define la identidad de Lunaria, su tono, sus reglas y sus limites.
 
-## 9. Flujo tecnico propuesto
+Funciona como la hoja de personaje del sistema conversacional.
 
-El flujo general del sistema sera:
+## 8. Como probar el avance
+
+Desde la carpeta del proyecto:
+
+```powershell
+python app.py
+```
+
+Tambien se puede probar directamente la lectura del Observatorio:
+
+```powershell
+python ingest.py
+```
+
+El resultado esperado de `ingest.py` es una lista de recomendaciones encontradas junto con su modo.
+
+## 9. Estado actual del RAG
+
+El sistema ya tiene una primera version del flujo:
 
 ```txt
 Usuario escribe un mensaje
 |
-Lunaria detecta intencion o modo
+Lunaria detecta una intencion aproximada
 |
-Busca recomendaciones relevantes en el Observatorio
+Busca recomendaciones en el Observatorio
 |
-Construye contexto para el modelo
+Construye contexto tecnico
 |
-Genera una respuesta con personalidad
-|
-Muestra la recomendacion y la razon por la que encaja
+Genera una respuesta de prueba
 ```
 
-## 10. Relacion entre diseno e implementacion
+Lo que ya existe:
 
-Este avance conecta directamente la identidad visual y conceptual de Lunaria con su implementacion tecnica.
+* Lectura del Observatorio.
+* Parsing de recomendaciones.
+* Modelo de datos para recomendaciones.
+* Deteccion basica de modo.
+* Busqueda local por coincidencias.
+* Respuesta simulada con contexto recuperado.
 
-La identidad visual define como se ve Lunaria.
-El prompt define como habla Lunaria.
-El Observatorio define que sabe Lunaria.
-Los enums definen como se organiza internamente Lunaria.
+Lo que todavia falta:
 
-De esta forma, el proyecto no se limita a tener una interfaz visual, sino que empieza a construir una logica funcional coherente con el personaje.
+* Embeddings.
+* Base vectorial.
+* Conexion real con un modelo de lenguaje.
+* Integracion con Chainlit.
+* Mejor deteccion de intencion.
+* Pruebas con mas mensajes reales.
+
+## 10. Importancia del avance
+
+La semana 7 es importante porque Lunaria deja de ser solamente una idea bien organizada y empieza a tener comportamiento funcional.
+
+Aunque la recuperacion todavia es sencilla, ya existe el ciclo basico del sistema RAG:
+
+```txt
+leer -> estructurar -> buscar -> recuperar -> responder
+```
+
+Esto permite avanzar con mas seguridad hacia embeddings y una interfaz conversacional, porque ya se comprobo que la informacion del Observatorio puede entrar al flujo tecnico.
 
 ## 11. Proximos pasos
 
-Los siguientes pasos del proyecto son:
+Los siguientes pasos recomendados son:
 
-1. Implementar el archivo `ingest.py` para procesar el Observatorio.
-2. Generar embeddings de las recomendaciones.
-3. Guardar las recomendaciones en una base vectorial.
-4. Construir `rag.py` para recuperar recomendaciones relevantes.
-5. Conectar el sistema RAG con Chainlit.
-6. Probar los cinco modos conversacionales.
-7. Ajustar el prompt segun las respuestas reales de Lunaria.
-8. Documentar errores, limites y mejoras.
+1. Agregar mas recomendaciones al Observatorio.
+2. Normalizar mejor los campos de metadata.
+3. Crear embeddings para cada recomendacion.
+4. Guardar los embeddings en una base vectorial local.
+5. Reemplazar la busqueda por palabras clave con busqueda semantica.
+6. Conectar `answer_with_lunaria()` con un modelo de lenguaje.
+7. Integrar el flujo con Chainlit.
+8. Probar conversaciones reales por cada modo.
+9. Ajustar el prompt segun errores y respuestas raras.
 
 ## 12. Conclusion
 
-El avance de la semana 6 representa el inicio de una nueva etapa para Lunaria.
+El avance de la semana 7 convierte la base tecnica de Lunaria en una primera version funcional.
 
-Despues de haber definido su personalidad, su primera interfaz y su identidad visual, este avance establece las bases para que Lunaria tenga una memoria curada propia.
+El proyecto ya puede leer su Observatorio, interpretar recomendaciones, buscar coincidencias y construir una respuesta usando informacion recuperada.
 
-El Observatorio permitira que sus recomendaciones no dependan unicamente del conocimiento general del modelo, sino de una seleccion intencional de libros, musica, referencias culturales y estados emocionales.
-
-La creacion del prompt, la organizacion de recomendaciones y el uso de enums son pasos iniciales importantes para convertir a Lunaria en una experiencia conversacional mas solida, coherente y escalable.
+Todavia no es el RAG final, pero ya tiene la forma principal del sistema. A partir de aqui, el siguiente salto natural es reemplazar la busqueda local por embeddings y conectar la respuesta con un modelo de lenguaje para que Lunaria pueda contestar con mas naturalidad sin perder el control sobre sus recomendaciones.

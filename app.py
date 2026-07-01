@@ -8,6 +8,7 @@ from rag import answer_with_lunaria
 
 def main() -> None:
     # Prueba sencilla mientras todavia no esta conectada la interfaz con Chainlit.
+    # En semana 7 ya sirve para revisar si Lunaria recupera algo del Observatorio.
     user_message = "Quiero leer algo triste pero bonito."
     response = answer_with_lunaria(user_message)
     print(response)

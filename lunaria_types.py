@@ -1,4 +1,5 @@
 from enum import Enum
+from dataclasses import dataclass
 
 
 # Segun mi hermano, un enum es como una lista cerrada:
@@ -38,3 +39,30 @@ class RecommendationType(str, Enum):
 class ProjectPath(str, Enum):
     OBSERVATORIO = "observatorio/recomendaciones.md"
     SYSTEM_PROMPT = "prompts/lunaria_system.txt"
+
+
+# Esta clase guarda una recomendacion ya ordenada.
+# Segun mi hermano, esto es mejor que cargar puro texto suelto,
+# porque asi Python sabe que cosa es el titulo, el modo, la fase y la descripcion.
+@dataclass
+class Recommendation:
+    title: str
+    author: str
+    content_type: str
+    mode: str
+    phases: list[str]
+    mood: str
+    description: str
+
+    def as_context(self) -> str:
+        # Este formato es el pedacito que se le pasaria a Lunaria como contexto.
+        # Lo dejo legible para que tambien se pueda imprimir y revisar en consola.
+        return (
+            f"Titulo: {self.title}\n"
+            f"Autor: {self.author}\n"
+            f"Tipo: {self.content_type}\n"
+            f"Modo: {self.mode}\n"
+            f"Fase: {', '.join(self.phases)}\n"
+            f"Estado de animo: {self.mood}\n"
+            f"Descripcion: {self.description}"
+        )
