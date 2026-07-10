@@ -1,4 +1,4 @@
-# Lunaria - Avance Semana 7
+# Lunaria - Avance Semana 8
 
 ## Repositorio del proyecto
 
@@ -6,150 +6,146 @@ El codigo fuente del proyecto se encuentra disponible en el siguiente enlace:
 
 [Ver repositorio en GitHub](https://github.com/FridaNevi/Lunaria)
 
-## Del Observatorio conceptual a una primera recuperacion funcional
+## De una recuperacion funcional a una recuperacion revisable
 
 ## 1. Descripcion general
 
-Este avance corresponde a la semana 7 del proyecto Lunaria. En la semana anterior se habia definido la estructura base del sistema RAG: el Observatorio, el prompt, los modos conversacionales y los enums principales.
+Este avance corresponde a la semana 8 del proyecto Lunaria. En la semana 7 el sistema ya podia leer el Observatorio, convertir recomendaciones en datos estructurados, buscar coincidencias y construir una respuesta de prueba.
 
-Durante esta semana el objetivo fue pasar de una estructura conceptual a una primera version funcional. Lunaria ya no solo carga archivos del proyecto, sino que puede leer el Observatorio, convertir sus recomendaciones en datos organizados, buscar coincidencias segun el mensaje del usuario y construir una respuesta de prueba usando esa informacion.
+Durante esta semana el objetivo no fue volver el proyecto mucho mas avanzado de golpe, sino hacer que la recuperacion sea mas facil de probar y revisar. Lunaria ahora no solo regresa una recomendacion, tambien muestra una traza tecnica sencilla con el puntaje y las razones por las que esa recomendacion fue elegida.
 
-Todavia no se implemento una base vectorial con embeddings. Esta semana se trabajo una recuperacion local sencilla, suficiente para probar el flujo antes de agregar mas complejidad.
+Todavia no se implementaron embeddings, base vectorial, Chainlit ni conexion real con un modelo de lenguaje. Esas partes siguen pendientes porque el proyecto todavia necesita varias semanas mas de construccion, pruebas y ajuste.
 
-## 2. Objetivo de la semana 7
+## 2. Objetivo de la semana 8
 
 La pregunta principal de esta etapa fue:
 
 ```txt
-Como puede Lunaria empezar a recuperar informacion real de su Observatorio?
+Como puedo saber si Lunaria esta recuperando recomendaciones de forma coherente?
 ```
 
 Para responderla, se trabajaron cuatro avances:
 
-* Convertir las recomendaciones del Observatorio en objetos estructurados.
-* Crear una busqueda local por palabras clave, modo y contenido.
-* Simular una respuesta de Lunaria usando recomendaciones recuperadas.
-* Actualizar el README para documentar el estado real del proyecto al cierre de la semana 7.
+* Agregar una estructura para guardar coincidencias recuperadas.
+* Registrar puntajes y razones durante la recuperacion.
+* Crear una traza tecnica legible para revisar el ranking.
+* Convertir `app.py` en una prueba de consola interactiva.
 
 ## 3. Avances tecnicos implementados
 
-### 3.1 Lectura del Observatorio
+### 3.1 RecommendationMatch
 
-El archivo `ingest.py` ahora mantiene la funcion para leer `observatorio/recomendaciones.md`, pero ya no se queda solamente con el texto completo.
+En `lunaria_types.py` se agrego la clase `RecommendationMatch`.
 
-La funcion `load_recommendations()` carga el Markdown, separa cada recomendacion y la convierte en una estructura que Python puede usar mejor.
+Esta clase guarda tres cosas:
 
-Esto importa porque el sistema deja de tratar el Observatorio como una hoja de texto gigante y empieza a verlo como una coleccion de recomendaciones con campos.
+* La recomendacion recuperada.
+* El puntaje que obtuvo.
+* Las razones por las que sumo puntos.
 
-### 3.2 Parsing de recomendaciones
+Esto ayuda a revisar el comportamiento del sistema sin depender todavia de una interfaz visual o una base vectorial.
 
-Se agrego la funcion `parse_recommendation()`.
+### 3.2 Evaluacion de recomendaciones
 
-Su trabajo es tomar un bloque como este:
+En `rag.py` se agrego `evaluate_recommendation()`.
+
+Antes la funcion principal solo calculaba un numero. Ahora la evaluacion tambien guarda explicaciones como:
 
 ```txt
-Titulo
-Autor
-Tipo
-Modo
-Fase
-Estado de animo
-Descripcion
+coincide con el modo biblioteca
+el mensaje tiene carga emocional y la fase incluye eclipse
+aparece la palabra 'triste' en la recomendacion
 ```
 
-Y convertirlo en una recomendacion estructurada.
+No es una explicacion perfecta, pero sirve para detectar si el sistema esta tomando decisiones razonables o si esta recuperando contenido por coincidencias muy debiles.
 
-Segun mi forma de entenderlo, este paso es como ordenar una libreta: el contenido ya existia, pero ahora cada dato tiene su lugar y puede ser encontrado con mas facilidad.
+### 3.3 Recuperacion con trazas
 
-### 3.3 Modelo de datos Recommendation
+Tambien se agrego `retrieve_recommendation_matches()`.
 
-En `lunaria_types.py` se agrego una clase `Recommendation`.
+Esta funcion recupera recomendaciones igual que antes, pero ahora regresa coincidencias completas con puntaje y razones.
 
-Esta clase guarda los campos principales de cada recomendacion:
-
-* `title`
-* `author`
-* `content_type`
-* `mode`
-* `phases`
-* `mood`
-* `description`
-
-Tambien incluye el metodo `as_context()`, que convierte la recomendacion en texto legible para que pueda usarse como contexto en el flujo RAG.
-
-Esto ayuda a separar dos cosas:
-
-* El Observatorio como archivo Markdown editable.
-* Las recomendaciones como datos internos que Lunaria puede consultar.
-
-### 3.4 Deteccion sencilla de modo
-
-En `rag.py` se agrego `detect_mode()`.
-
-Esta funcion revisa el mensaje del usuario y busca palabras relacionadas con los modos de Lunaria:
-
-* Biblioteca: leer, libro, novela, autor.
-* Frecuencia: musica, cancion, playlist.
-* Chisme: chisme, contexto, dato curioso.
-* Eclipse: triste, cansada, bloqueo, confusion.
-* Caos: raro, inesperado, caos, sorprendeme.
-
-No es una deteccion perfecta, pero sirve como primera version para probar el comportamiento del sistema sin depender todavia de un modelo externo.
-
-### 3.5 Recuperacion local de recomendaciones
-
-Tambien se agrego `retrieve_recommendations()`.
-
-Esta funcion representa el primer intento real del RAG:
+El flujo queda asi:
 
 ```txt
 Mensaje del usuario
 |
-Detectar posible modo
+Detectar modo aproximado
 |
-Comparar contra recomendaciones del Observatorio
+Evaluar cada recomendacion
 |
-Ordenar por coincidencia
+Guardar puntaje y razones
 |
-Regresar las mejores senales encontradas
+Ordenar coincidencias
+|
+Regresar las mejores senales
 ```
 
-La busqueda suma puntos cuando el mensaje coincide con el modo, el titulo, la fase, el estado de animo o la descripcion de una recomendacion.
+### 3.4 Compatibilidad con la version anterior
 
-Aunque no usa embeddings, ya permite probar el flujo completo de recuperacion.
+La funcion `retrieve_recommendations()` se conserva.
 
-## 4. Respuesta de prueba de Lunaria
+Esto importa porque permite que otras partes del proyecto sigan pidiendo solo recomendaciones, sin preocuparse por los puntajes. La version con trazas queda disponible para pruebas y revision tecnica.
 
-La funcion `answer_with_lunaria()` tambien evoluciono.
+### 3.5 Prueba de consola interactiva
 
-Antes solo cargaba el prompt y mostraba un placeholder. Ahora:
+`app.py` ya no usa solamente un mensaje fijo.
 
-1. Carga el prompt del sistema.
-2. Recupera recomendaciones del Observatorio.
-3. Construye contexto tecnico con el mensaje del usuario y la informacion recuperada.
-4. Genera una respuesta simulada de Lunaria.
+Ahora permite escribir varios mensajes desde la consola:
 
-La respuesta todavia no viene de un modelo de lenguaje conectado. Es una respuesta armada desde Python para comprobar que la recuperacion funciona.
+```txt
+Tu mensaje: quiero leer algo triste
+Tu mensaje: dame musica para caminar
+Tu mensaje: salir
+```
 
-Esto es importante porque permite validar la logica antes de conectar Groq, Chainlit o una base vectorial.
+Esto hace mas facil probar distintos modos sin editar el codigo cada vez.
 
-## 5. Ampliacion del Observatorio
+## 4. Estado actual del proyecto
 
-El archivo `observatorio/recomendaciones.md` tambien se amplio.
+Al cierre de la semana 8, Lunaria tiene un flujo RAG local y provisional:
 
-Ahora el Observatorio incluye senales para los cinco modos principales:
+```txt
+Usuario escribe un mensaje
+|
+Lunaria detecta una intencion aproximada
+|
+Busca recomendaciones en el Observatorio
+|
+Asigna puntajes y razones
+|
+Construye contexto tecnico
+|
+Genera una respuesta simulada
+```
 
-* Biblioteca
-* Frecuencia
-* Chisme
-* Eclipse
-* Caos
+Lo que ya existe:
 
-Esto permite probar que la deteccion de modo no se quede limitada solo a libros o apoyo emocional.
+* Lectura del Observatorio.
+* Parsing de recomendaciones.
+* Modelo de datos `Recommendation`.
+* Modelo de coincidencias `RecommendationMatch`.
+* Deteccion basica de modo.
+* Busqueda local por coincidencias.
+* Puntajes de recuperacion.
+* Traza tecnica de recuperacion.
+* Respuesta simulada con contexto recuperado.
+* Prueba de consola interactiva.
 
-## 6. Estructura actual del proyecto
+Lo que todavia falta:
 
-La estructura del proyecto al cierre de la semana 7 queda asi:
+* Embeddings.
+* Base vectorial local.
+* Conexion real con un modelo de lenguaje.
+* Integracion con Chainlit.
+* Mejor deteccion de intencion.
+* Mas recomendaciones en el Observatorio.
+* Pruebas con conversaciones reales.
+* Separar mejor salida tecnica y respuesta final.
+
+## 5. Estructura actual del proyecto
+
+La estructura del proyecto al cierre de la semana 8 queda asi:
 
 ```txt
 LunariaRAG/
@@ -165,13 +161,13 @@ LunariaRAG/
    |- lunaria_system.txt
 ```
 
-## 7. Explicacion de archivos
+## 6. Explicacion de archivos
 
 ### app.py
 
 Es el punto de entrada de prueba.
 
-Por ahora no levanta Chainlit. Sirve para ejecutar un mensaje de ejemplo y revisar en consola si Lunaria recupera informacion del Observatorio.
+Por ahora no levanta Chainlit. Sirve para escribir mensajes desde consola y revisar si Lunaria recupera informacion coherente del Observatorio.
 
 ### ingest.py
 
@@ -185,8 +181,9 @@ Contiene la logica principal del flujo RAG provisional:
 
 * Cargar el prompt.
 * Detectar modo.
-* Puntuar recomendaciones.
-* Recuperar coincidencias.
+* Evaluar recomendaciones.
+* Puntuar coincidencias.
+* Registrar razones de recuperacion.
 * Armar una respuesta de prueba.
 
 ### lunaria_types.py
@@ -198,6 +195,7 @@ Guarda enums y estructuras compartidas:
 * Tipos de recomendacion.
 * Rutas del proyecto.
 * Clase `Recommendation`.
+* Clase `RecommendationMatch`.
 
 ### observatorio/recomendaciones.md
 
@@ -211,12 +209,28 @@ Define la identidad de Lunaria, su tono, sus reglas y sus limites.
 
 Funciona como la hoja de personaje del sistema conversacional.
 
-## 8. Como probar el avance
+## 7. Como probar el avance
 
 Desde la carpeta del proyecto:
 
 ```powershell
 python app.py
+```
+
+Despues se pueden escribir mensajes como:
+
+```txt
+Quiero leer algo triste pero bonito.
+Dame musica para caminar como protagonista.
+Quiero un chisme cultural.
+Estoy cansada y confundida.
+Sorprendeme con algo raro.
+```
+
+Para cerrar la prueba:
+
+```txt
+salir
 ```
 
 Tambien se puede probar directamente la lectura del Observatorio:
@@ -227,70 +241,31 @@ python ingest.py
 
 El resultado esperado de `ingest.py` es una lista de recomendaciones encontradas junto con su modo.
 
-## 9. Estado actual del RAG
+## 8. Importancia del avance
 
-El sistema ya tiene una primera version del flujo:
+La semana 8 es importante porque hace que el sistema sea mas revisable.
 
-```txt
-Usuario escribe un mensaje
-|
-Lunaria detecta una intencion aproximada
-|
-Busca recomendaciones en el Observatorio
-|
-Construye contexto tecnico
-|
-Genera una respuesta de prueba
-```
+Antes Lunaria podia recuperar recomendaciones, pero no era tan claro por que una recomendacion quedaba arriba de otra. Ahora la traza permite observar el puntaje y las razones de cada coincidencia.
 
-Lo que ya existe:
+Esto todavia no reemplaza una evaluacion real, pero ayuda a encontrar errores antes de agregar embeddings o un modelo de lenguaje.
 
-* Lectura del Observatorio.
-* Parsing de recomendaciones.
-* Modelo de datos para recomendaciones.
-* Deteccion basica de modo.
-* Busqueda local por coincidencias.
-* Respuesta simulada con contexto recuperado.
+## 9. Ruta aproximada para las siguientes semanas
 
-Lo que todavia falta:
+Como todavia quedan alrededor de seis semanas de trabajo, el proyecto puede avanzar por etapas:
 
-* Embeddings.
-* Base vectorial.
-* Conexion real con un modelo de lenguaje.
-* Integracion con Chainlit.
-* Mejor deteccion de intencion.
-* Pruebas con mas mensajes reales.
+1. Semana 9: ampliar el Observatorio y normalizar mejor los campos.
+2. Semana 10: crear pruebas simples con mensajes esperados por cada modo.
+3. Semana 11: introducir embeddings de forma local.
+4. Semana 12: guardar y consultar una base vectorial pequena.
+5. Semana 13: conectar la respuesta con un modelo de lenguaje.
+6. Semana 14: integrar Chainlit y probar conversaciones completas.
 
-## 10. Importancia del avance
+Esta ruta puede cambiar, pero mantiene una progresion razonable: primero datos claros, despues pruebas, despues busqueda semantica y al final interfaz conversacional.
 
-La semana 7 es importante porque Lunaria deja de ser solamente una idea bien organizada y empieza a tener comportamiento funcional.
+## 10. Conclusion
 
-Aunque la recuperacion todavia es sencilla, ya existe el ciclo basico del sistema RAG:
+El avance de la semana 8 no convierte a Lunaria en el sistema final, pero mejora una parte necesaria: poder revisar el comportamiento de la recuperacion.
 
-```txt
-leer -> estructurar -> buscar -> recuperar -> responder
-```
+El proyecto ya puede leer su Observatorio, interpretar recomendaciones, buscar coincidencias, explicar por que las eligio y probar varios mensajes desde consola.
 
-Esto permite avanzar con mas seguridad hacia embeddings y una interfaz conversacional, porque ya se comprobo que la informacion del Observatorio puede entrar al flujo tecnico.
-
-## 11. Proximos pasos
-
-Los siguientes pasos recomendados son:
-
-1. Agregar mas recomendaciones al Observatorio.
-2. Normalizar mejor los campos de metadata.
-3. Crear embeddings para cada recomendacion.
-4. Guardar los embeddings en una base vectorial local.
-5. Reemplazar la busqueda por palabras clave con busqueda semantica.
-6. Conectar `answer_with_lunaria()` con un modelo de lenguaje.
-7. Integrar el flujo con Chainlit.
-8. Probar conversaciones reales por cada modo.
-9. Ajustar el prompt segun errores y respuestas raras.
-
-## 12. Conclusion
-
-El avance de la semana 7 convierte la base tecnica de Lunaria en una primera version funcional.
-
-El proyecto ya puede leer su Observatorio, interpretar recomendaciones, buscar coincidencias y construir una respuesta usando informacion recuperada.
-
-Todavia no es el RAG final, pero ya tiene la forma principal del sistema. A partir de aqui, el siguiente salto natural es reemplazar la busqueda local por embeddings y conectar la respuesta con un modelo de lenguaje para que Lunaria pueda contestar con mas naturalidad sin perder el control sobre sus recomendaciones.
+El siguiente paso natural es fortalecer el Observatorio y crear pruebas simples antes de saltar a embeddings, porque una busqueda semantica solo sirve si los datos base ya estan bien ordenados.

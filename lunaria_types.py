@@ -66,3 +66,13 @@ class Recommendation:
             f"Estado de animo: {self.mood}\n"
             f"Descripcion: {self.description}"
         )
+
+
+# Esta clase guarda una recomendacion junto con el puntaje que obtuvo.
+# Segun mi hermano, esto ayuda a revisar por que el sistema eligio una cosa
+# y no otra, antes de meter busquedas mas avanzadas.
+@dataclass
+class RecommendationMatch:
+    recommendation: Recommendation
+    score: int
+    reasons: list[str]
