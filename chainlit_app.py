@@ -1,6 +1,6 @@
 import chainlit as cl
 
-from media_cards import build_media_elements
+from media_cards import build_media_elements, search_external
 from rag import generate_reply, retrieve_semantic_matches
 
 # Semana 11: esta es la primera interfaz conversacional real de Lunaria.
@@ -25,6 +25,14 @@ async def main(message: cl.Message) -> None:
     # de cancion, un visor de libro o un video en el panel lateral.
     matches = retrieve_semantic_matches(message.content)
     recommendations = [match.recommendation for match in matches]
+
+    # Si el Observatorio no tiene nada, se busca en vivo en YouTube,
+    # Google Books o Apple Music antes de rendirse.
+    if not recommendations:
+        external_recommendation = search_external(message.content)
+        if external_recommendation:
+            recommendations = [external_recommendation]
+
     response = generate_reply(message.content, recommendations)
 
     elements = build_media_elements(recommendations[0]) if recommendations else []

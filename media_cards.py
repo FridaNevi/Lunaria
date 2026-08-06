@@ -165,3 +165,51 @@ def build_media_elements(recommendation: Recommendation) -> list:
         return []
 
     return [cl.CustomElement(name="RecommendationCard", display="inline", props=props)]
+
+
+def search_external(user_message: str) -> Recommendation | None:
+    # Cuando el Observatorio no tiene nada que ofrecer, esta funcion busca
+    # en vivo con el mensaje tal cual lo escribio la persona: primero en
+    # YouTube, despues en Google Books, y al final en Apple Music (iTunes).
+    # Se queda con el primer resultado que encuentre, en ese orden.
+    video = fetch_youtube_video(user_message)
+    if video:
+        snippet = video.get("snippet", {})
+        video_id = video.get("id", {}).get("videoId", "")
+        return Recommendation(
+            title=snippet.get("title", user_message),
+            author=snippet.get("channelTitle", "YouTube"),
+            content_type="video",
+            mode="externo",
+            phases=[],
+            mood="resultado externo, no forma parte del Observatorio",
+            description=snippet.get("description") or "Resultado encontrado en vivo en YouTube.",
+            source_url=f"https://www.youtube.com/watch?v={video_id}" if video_id else "",
+        )
+
+    book = fetch_google_book(user_message)
+    if book:
+        volume_info = book.get("volumeInfo", {})
+        return Recommendation(
+            title=volume_info.get("title", user_message),
+            author=", ".join(volume_info.get("authors", [])) or "Autor desconocido",
+            content_type="book",
+            mode="externo",
+            phases=[],
+            mood="resultado externo, no forma parte del Observatorio",
+            description=volume_info.get("description") or "Resultado encontrado en vivo en Google Books.",
+        )
+
+    track = fetch_itunes_track(user_message)
+    if track:
+        return Recommendation(
+            title=track.get("trackName", user_message),
+            author=track.get("artistName", "Apple Music"),
+            content_type="music",
+            mode="externo",
+            phases=[],
+            mood="resultado externo, no forma parte del Observatorio",
+            description="Resultado encontrado en vivo en Apple Music.",
+        )
+
+    return None
