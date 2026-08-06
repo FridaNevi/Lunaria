@@ -143,11 +143,14 @@ def retrieve_semantic_matches(user_message: str, limit: int = 2) -> list[Recomme
     # para que Lunaria no se quede sin ninguna recomendacion que ofrecer.
     try:
         matches = vector_store.search_similar(user_message, limit=limit)
+        print(f"Qdrant devolvio {len(matches)} resultados")
         if matches:
             return matches
-    except Exception:
-        pass
-    return retrieve_recommendation_matches(user_message, limit=limit)
+    except Exception as error:
+        print(f"Fallo Qdrant, se usa busqueda por palabras: {error}")
+    lexical_matches = retrieve_recommendation_matches(user_message, limit=limit)
+    print(f"Modo detectado: {detect_mode(user_message)} | matches por palabras: {len(lexical_matches)}")
+    return lexical_matches
 
 
 def format_retrieval_trace(matches: list[RecommendationMatch]) -> str:
