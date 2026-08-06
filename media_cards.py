@@ -113,7 +113,12 @@ def _video_props(recommendation: Recommendation) -> dict | None:
     # Primero intenta traer algo dinamico de YouTube. Si no hay
     # YOUTUBE_API_KEY, o la busqueda falla, usa el link fijo que quedo
     # guardado en el Observatorio.
-    video = fetch_youtube_video(f"{recommendation.title} {recommendation.description}")
+    # Si el video ya viene de una busqueda externa (search_external), no
+    # se vuelve a buscar: ya se encontro el video exacto una vez, y buscar
+    # de nuevo con "titulo descripcion" puede traer algo totalmente distinto.
+    video = None if recommendation.mode == "externo" else fetch_youtube_video(
+        f"{recommendation.title} {recommendation.description}"
+    )
 
     if video:
         snippet = video.get("snippet", {})
