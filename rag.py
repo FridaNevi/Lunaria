@@ -48,7 +48,7 @@ def detect_mode(user_message: str) -> str | None:
     message = user_message.lower()
     mode_keywords = {
         LunariaMode.BIBLIOTECA.value: ["leer", "libro", "novela", "autor", "biblioteca"],
-        LunariaMode.FRECUENCIA.value: ["musica", "música", "cancion", "canción", "playlist"],
+        LunariaMode.FRECUENCIA.value: ["musica", "música", "cancion", "canción", "playlist", "podcast"],
         LunariaMode.CHISME.value: ["chisme", "contexto", "dato", "curioso", "historia detras"],
         LunariaMode.ECLIPSE.value: ["triste", "cansada", "cansado", "bloqueo", "confusion", "confusión"],
         LunariaMode.CAOS.value: ["raro", "inesperado", "caos", "sorprendeme", "sorpréndeme"],
