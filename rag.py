@@ -143,14 +143,11 @@ def retrieve_semantic_matches(user_message: str, limit: int = 2) -> list[Recomme
     # para que Lunaria no se quede sin ninguna recomendacion que ofrecer.
     try:
         matches = vector_store.search_similar(user_message, limit=limit)
-        print(f"Qdrant devolvio {len(matches)} resultados")
         if matches:
             return matches
-    except Exception as error:
-        print(f"Fallo Qdrant, se usa busqueda por palabras: {error}")
-    lexical_matches = retrieve_recommendation_matches(user_message, limit=limit)
-    print(f"Modo detectado: {detect_mode(user_message)} | matches por palabras: {len(lexical_matches)}")
-    return lexical_matches
+    except Exception:
+        pass
+    return retrieve_recommendation_matches(user_message, limit=limit)
 
 
 def format_retrieval_trace(matches: list[RecommendationMatch]) -> str:
@@ -221,8 +218,7 @@ def generate_reply(user_message: str, recommendations: list[Recommendation]) -> 
     try:
         system_prompt = load_system_prompt()
         return generate_lunaria_reply(system_prompt, user_message, recovered_text)
-    except Exception as error:
-        print(f"Fallo Groq, se usa respaldo: {error}")
+    except Exception:
         return format_lunaria_answer(user_message, recommendations)
 
 
