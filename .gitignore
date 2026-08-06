@@ -2,4 +2,3 @@
 entorno_lunaria/
 __pycache__/
 .pytest_cache/
-.chainlit/
