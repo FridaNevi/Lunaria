@@ -218,7 +218,8 @@ def generate_reply(user_message: str, recommendations: list[Recommendation]) -> 
     try:
         system_prompt = load_system_prompt()
         return generate_lunaria_reply(system_prompt, user_message, recovered_text)
-    except Exception:
+    except Exception as error:
+        print(f"Fallo Groq, se usa respaldo: {error}")
         return format_lunaria_answer(user_message, recommendations)
 
 
