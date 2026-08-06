@@ -1,0 +1,8 @@
+/* ==========================================================================
+   Lunaria — sidebar.css
+   Semana 12: se elimino el panel lateral (Side View). Las recomendaciones
+   ahora se ven en un popup (ver cards.css), no en un panel aparte.
+   Este archivo se deja vacio a proposito, respetando la estructura modular
+   original, por si mas adelante se agrega un historial de conversaciones
+   con persistencia real (Chainlit si usa un sidebar de verdad para eso).
+   ========================================================================== */

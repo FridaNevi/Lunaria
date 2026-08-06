@@ -1,0 +1,45 @@
+/* ==========================================================================
+   Lunaria — buttons.css
+   Todos los botones de Chainlit comparten la misma clase base de fabrica
+   (inline-flex items-center justify-center...). Se homogeneiza esa base
+   primero, y despues se le da personalidad propia al boton de enviar,
+   que es el unico que de verdad se nota todo el tiempo.
+   ========================================================================== */
+
+button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap {
+  font-family: var(--lun-font-sans);
+  font-weight: 600;
+  border-radius: var(--lun-radius-btn);
+  transition: color var(--lun-transition), background-color var(--lun-transition),
+    box-shadow var(--lun-transition), transform var(--lun-transition);
+}
+
+button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap:hover {
+  background-color: rgba(212, 175, 55, 0.08);
+}
+
+button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--lun-bg-primary), 0 0 0 4px var(--lun-gold);
+}
+
+/* El boton de enviar: un pequeno astro violeta */
+#chat-submit {
+  border-radius: 999px;
+  background: linear-gradient(155deg, var(--lun-primary) 0%, var(--lun-primary-hover) 130%);
+  box-shadow: var(--lun-glow-primary);
+}
+
+#chat-submit:hover {
+  background: linear-gradient(155deg, var(--lun-primary-hover) 0%, var(--lun-gold) 180%);
+  box-shadow: 0 0 28px rgba(128, 109, 232, 0.5);
+  transform: scale(1.06);
+}
+
+#chat-submit:active {
+  transform: scale(0.96);
+}
+
+#upload-button:hover svg {
+  color: var(--lun-gold);
+}

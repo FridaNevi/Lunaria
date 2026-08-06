@@ -1,0 +1,35 @@
+/* ==========================================================================
+   Lunaria — header.css
+   La barra superior (y la cabecera del panel lateral, que Chainlit arma
+   con el mismo componente) se vuelve minimalista: poca altura, borde
+   dorado casi invisible abajo, mucho espacio respirando a los lados.
+   ========================================================================== */
+
+div.p-3.flex.items-center.justify-between.gap-2.relative {
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--lun-border-soft);
+  background: linear-gradient(180deg, rgba(23, 31, 58, 0.6) 0%, rgba(23, 31, 58, 0) 100%);
+}
+
+#readme-button {
+  font-family: var(--lun-font-sans);
+  font-weight: 600;
+  color: var(--lun-text-secondary);
+  letter-spacing: 0.02em;
+}
+
+#readme-button:hover {
+  color: var(--lun-cream);
+}
+
+#new-chat-button svg,
+#theme-toggle svg {
+  color: var(--lun-text-secondary);
+  transition: color var(--lun-transition), transform var(--lun-transition);
+}
+
+#new-chat-button:hover svg,
+#theme-toggle:hover svg {
+  color: var(--lun-gold);
+  transform: scale(1.05);
+}

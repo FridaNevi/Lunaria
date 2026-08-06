@@ -1,0 +1,25 @@
+/* ==========================================================================
+   Lunaria — style.css
+   Punto de entrada. El orden importa: primero variables y tema, despues
+   estructura, despues componentes, al final ajustes finos. No poner
+   estilos sueltos aqui, todo va en styles/.
+   ========================================================================== */
+
+@import "./styles/variables.css";
+@import "./styles/theme.css";
+@import "./styles/typography.css";
+
+@import "./styles/layout.css";
+@import "./styles/sidebar.css";
+@import "./styles/header.css";
+@import "./styles/chat.css";
+@import "./styles/messages.css";
+
+@import "./styles/cards.css";
+@import "./styles/buttons.css";
+@import "./styles/forms.css";
+@import "./styles/icons.css";
+
+@import "./styles/animations.css";
+@import "./styles/utilities.css";
+@import "./styles/responsive.css";

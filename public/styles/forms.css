@@ -1,0 +1,29 @@
+/* ==========================================================================
+   Lunaria — forms.css
+   El composer: ancho, oscuro, limpio, con borde dorado sutil y un focus
+   que se nota sin gritar. El textarea usa bg-accent de fabrica (Chainlit),
+   pero aqui se pisa por un fondo oscuro propio: el violeta se guarda para
+   el mensaje de usuario, no para la caja de escribir.
+   ========================================================================== */
+
+div.bg-accent.rounded-3xl.p-3.px-4.w-full.min-h-24 {
+  background-color: var(--lun-surface);
+  border: 1px solid var(--lun-border);
+  border-radius: var(--lun-radius-input);
+  box-shadow: var(--lun-shadow-soft);
+  transition: border-color var(--lun-transition), box-shadow var(--lun-transition);
+}
+
+div.bg-accent.rounded-3xl.p-3.px-4.w-full.min-h-24:focus-within {
+  border-color: var(--lun-gold);
+  box-shadow: var(--lun-shadow-soft), 0 0 0 3px rgba(212, 175, 55, 0.18);
+}
+
+#chat-input {
+  color: var(--lun-text);
+  caret-color: var(--lun-gold);
+}
+
+#chat-input::placeholder {
+  color: var(--lun-muted);
+}

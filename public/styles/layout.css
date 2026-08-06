@@ -1,0 +1,25 @@
+/* ==========================================================================
+   Lunaria — layout.css
+   Sensacion de lectura, no de chat masivo: columna centrada, ancho maximo
+   moderado y mucho aire alrededor. Chainlit no expone un contenedor con
+   id propio para la lista de mensajes, asi que el ancho se limita en cada
+   fila de mensaje (".step") y en la caja del composer, que ya trae su
+   propio "mx-auto" de fabrica.
+   ========================================================================== */
+
+.step {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+div.flex.flex-col.mx-auto.w-full.p-4.pt-0 {
+  max-width: 900px;
+}
+
+/* Un poco mas de aire vertical entre pregunta y respuesta */
+.step + .step {
+  margin-top: 0.5rem;
+}

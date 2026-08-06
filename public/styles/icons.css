@@ -1,0 +1,16 @@
+/* ==========================================================================
+   Lunaria — icons.css
+   La mayoria de los iconos ya heredan su color de --muted-foreground /
+   --primary via currentColor, gracias a las variables de theme.json. Aqui
+   solo se pareja el grosor de trazo para que todos se sientan de la misma
+   familia (el objetivo es que ningun icono se vea "prestado").
+   ========================================================================== */
+
+svg {
+  stroke-width: 1.75px;
+}
+
+#chat-submit svg {
+  color: var(--lun-cream);
+  stroke-width: 2px;
+}

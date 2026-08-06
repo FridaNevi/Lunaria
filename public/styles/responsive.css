@@ -1,0 +1,34 @@
+/* ==========================================================================
+   Lunaria — responsive.css
+   Desktop primero. En tablet y mobile se reduce el padding lateral para
+   no desperdiciar pantalla, pero ningun componente cambia de estructura.
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  .step {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  div.flex.flex-col.mx-auto.w-full.p-4.pt-0 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .step {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    padding-top: 0.85rem;
+    padding-bottom: 0.85rem;
+  }
+
+  .ai-message .message-content {
+    padding: 0.9rem 1.1rem;
+  }
+
+  div.p-3.flex.items-center.justify-between.gap-2.relative {
+    padding: 0.6rem 0.85rem;
+  }
+}

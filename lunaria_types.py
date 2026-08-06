@@ -1,7 +1,6 @@
 from enum import Enum
 from dataclasses import dataclass
 
-
 # Segun mi hermano, un enum es como una lista cerrada:
 # aqui pongo las opciones validas para no escribir "biblioteca",
 # "frecuencia" o "eclipse" de mil formas diferentes.
@@ -53,6 +52,9 @@ class Recommendation:
     phases: list[str]
     mood: str
     description: str
+    # Campo opcional: solo las recomendaciones de video traen link.
+    # Si no hay video, se queda como texto vacio y no pasa nada.
+    source_url: str = ""
 
     def as_context(self) -> str:
         # Este formato es el pedacito que se le pasaria a Lunaria como contexto.

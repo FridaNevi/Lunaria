@@ -36,26 +36,49 @@ def _read_field(lines: list[str], field_name: str) -> str:
     return ""
 
 
+def normalize_field(value: str) -> str:
+    # En semana 9 el Observatorio crecio, y a mano es facil que un campo
+    # quede con mayusculas de mas o espacios raros. Esta funcion pareja
+    # deja todo en minusculas y sin espacios sobrantes antes de comparar.
+    return value.strip().lower()
+
+
 def parse_recommendation(section: str) -> Recommendation:
     # Cada bloque del markdown empieza con el titulo y despues trae metadata.
     # Aqui convierto ese bloque en una Recommendation para poder buscar mejor.
     lines = [line.strip() for line in section.splitlines() if line.strip()]
     title = lines[0].replace("###", "").strip()
-    phases = [
-        phase.strip()
-        for phase in _read_field(lines, "Fase").split(",")
-        if phase.strip()
-    ]
+    if not title:
+        raise ValueError("Se encontro una seccion del Observatorio sin titulo.")
 
-    return Recommendation(
+    # dict.fromkeys en vez de un set: quita fases repetidas pero conserva
+    # el orden en el que quedaron escritas en el markdown.
+    phases = list(
+        dict.fromkeys(
+            normalize_field(phase)
+            for phase in _read_field(lines, "Fase").split(",")
+            if phase.strip()
+        )
+    )
+
+    recommendation = Recommendation(
         title=title,
         author=_read_field(lines, "Autor"),
-        content_type=_read_field(lines, "Tipo"),
-        mode=_read_field(lines, "Modo"),
+        content_type=normalize_field(_read_field(lines, "Tipo")),
+        mode=normalize_field(_read_field(lines, "Modo")),
         phases=phases,
         mood=_read_field(lines, "Estado de ánimo"),
         description=_read_field(lines, "Descripción"),
+        # Campo opcional: solo las recomendaciones de video lo traen.
+        source_url=_read_field(lines, "Video"),
     )
+
+    if not recommendation.mode:
+        raise ValueError(f"'{title}' no tiene Modo en el Observatorio.")
+    if not recommendation.description:
+        raise ValueError(f"'{title}' no tiene Descripción en el Observatorio.")
+
+    return recommendation
 
 
 def load_recommendations() -> list[Recommendation]:

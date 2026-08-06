@@ -1,0 +1,14 @@
+/* ==========================================================================
+   Lunaria — utilities.css
+   Un par de clases de apoyo, nada mas. La idea del sistema es que casi
+   nunca hagan falta.
+   ========================================================================== */
+
+.lun-glow-text {
+  text-shadow: 0 0 12px rgba(212, 175, 55, 0.35);
+}
+
+.lun-divider {
+  border: none;
+  border-top: 1px solid var(--lun-border-soft);
+}

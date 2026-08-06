@@ -1,6 +1,9 @@
 from pathlib import Path
 
+import vector_store
+from config import GROQ_API_KEY
 from ingest import load_recommendations
+from llm import generate_lunaria_reply
 from lunaria_types import LunariaMode, ProjectPath, Recommendation, RecommendationMatch
 
 
@@ -132,6 +135,21 @@ def retrieve_recommendations(user_message: str, limit: int = 2) -> list[Recommen
     ]
 
 
+def retrieve_semantic_matches(user_message: str, limit: int = 2) -> list[RecommendationMatch]:
+    # Semana 10: en vez de sumar puntos por palabras iguales, esta busqueda
+    # compara embeddings en Qdrant, o sea, compara significado.
+    # Si Qdrant no esta disponible (por ejemplo, todavia no se levanto el
+    # contenedor local), se cae de vuelta a la busqueda lexica de siempre
+    # para que Lunaria no se quede sin ninguna recomendacion que ofrecer.
+    try:
+        matches = vector_store.search_similar(user_message, limit=limit)
+        if matches:
+            return matches
+    except Exception:
+        pass
+    return retrieve_recommendation_matches(user_message, limit=limit)
+
+
 def format_retrieval_trace(matches: list[RecommendationMatch]) -> str:
     # Esta traza no es para el usuario final.
     # Sirve para revisar en consola que la recuperacion tenga sentido.
@@ -185,11 +203,31 @@ def format_lunaria_answer(user_message: str, recommendations: list[Recommendatio
     )
 
 
+def generate_reply(user_message: str, recommendations: list[Recommendation]) -> str:
+    # Semana 11: si hay una GROQ_API_KEY configurada, la respuesta la escribe
+    # el modelo de lenguaje real, usando el Observatorio recuperado como contexto.
+    # Si no hay llave, o si Groq falla, se usa la respuesta simulada de
+    # format_lunaria_answer como respaldo, igual que se hizo con Qdrant.
+    if not GROQ_API_KEY:
+        return format_lunaria_answer(user_message, recommendations)
+
+    recovered_text = "\n\n---\n\n".join(
+        recommendation.as_context() for recommendation in recommendations
+    ) or "No se encontro informacion suficiente en el Observatorio."
+
+    try:
+        system_prompt = load_system_prompt()
+        return generate_lunaria_reply(system_prompt, user_message, recovered_text)
+    except Exception:
+        return format_lunaria_answer(user_message, recommendations)
+
+
 def answer_with_lunaria(user_message: str) -> str:
-    # Semana 8: sigue siendo una respuesta simulada, pero ahora deja ver
-    # que coincidencias encontro y por que las eligio.
+    # Esta version si incluye la traza tecnica y el contexto usado.
+    # Sirve para revisar en consola, con app.py, que la recuperacion
+    # (ahora semantica) siga trayendo recomendaciones coherentes.
     system_prompt = load_system_prompt()
-    matches = retrieve_recommendation_matches(user_message)
+    matches = retrieve_semantic_matches(user_message)
     recommendations = [match.recommendation for match in matches]
     recovered_text = "\n\n---\n\n".join(
         recommendation.as_context() for recommendation in recommendations
@@ -199,7 +237,7 @@ def answer_with_lunaria(user_message: str) -> str:
         recovered_text or "No se encontro informacion suficiente en el Observatorio.",
     )
     trace = format_retrieval_trace(matches)
-    response = format_lunaria_answer(user_message, recommendations)
+    response = generate_reply(user_message, recommendations)
     return (
         f"{response}\n\n"
         f"---\nTraza de recuperacion:\n{trace}\n\n"

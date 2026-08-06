@@ -1,0 +1,60 @@
+/* ==========================================================================
+   Lunaria — theme.css
+   El fondo del Observatorio: nunca un color plano. Varias capas apiladas
+   (degradado radial + degradado lineal + estrellas discretas) para dar
+   sensacion de profundidad de noche, sin que se note el truco.
+   ========================================================================== */
+
+html,
+body,
+#root {
+  background-color: var(--lun-bg-primary);
+}
+
+body {
+  background-image:
+    /* estrellas: puntos muy pequenos y muy tenues, repetidos */
+    radial-gradient(1px 1px at 12% 18%, rgba(247, 243, 234, 0.55) 0, transparent 60%),
+    radial-gradient(1px 1px at 78% 8%, rgba(247, 243, 234, 0.4) 0, transparent 60%),
+    radial-gradient(1.5px 1.5px at 32% 62%, rgba(212, 175, 55, 0.35) 0, transparent 60%),
+    radial-gradient(1px 1px at 92% 74%, rgba(247, 243, 234, 0.35) 0, transparent 60%),
+    radial-gradient(1px 1px at 55% 88%, rgba(247, 243, 234, 0.3) 0, transparent 60%),
+    radial-gradient(1.5px 1.5px at 8% 92%, rgba(212, 175, 55, 0.3) 0, transparent 60%),
+    /* luz de luna: un resplandor suave arriba a la derecha */
+    radial-gradient(ellipse 60% 45% at 82% -5%, rgba(109, 90, 207, 0.22) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 15% 105%, rgba(212, 175, 55, 0.08) 0%, transparent 70%),
+    /* base: degradado lineal muy sutil de la noche */
+    linear-gradient(180deg, var(--lun-bg-primary) 0%, var(--lun-bg-secondary) 100%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Scrollbar del Observatorio: oscura, con hilo violeta y hover dorado */
+.custom-scrollbar,
+* {
+  scrollbar-color: var(--lun-primary) transparent;
+  scrollbar-width: thin;
+}
+
+.custom-scrollbar::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb {
+  background-color: var(--lun-primary);
+  border-radius: 999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover,
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--lun-gold);
+}

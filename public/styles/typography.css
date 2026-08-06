@@ -1,0 +1,55 @@
+/* ==========================================================================
+   Lunaria — typography.css
+   Cormorant Garamond para titulos (editorial, con aire), Inter para todo
+   lo demas. Las fuentes en si se cargan desde theme.json (custom_fonts),
+   aqui solo se asignan.
+   ========================================================================== */
+
+body,
+button,
+input,
+textarea {
+  font-family: var(--lun-font-sans);
+}
+
+/* Cualquier titulo que aparezca dentro de una respuesta de Lunaria
+   (markdown con #, ##, etc.) se siente como capitulo de libro, no como
+   texto de chatbot. */
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  font-family: var(--lun-font-serif);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--lun-cream);
+}
+
+.prose strong {
+  color: var(--lun-cream);
+}
+
+.prose em {
+  color: var(--lun-text-secondary);
+}
+
+.prose a {
+  color: var(--lun-gold);
+  text-decoration-color: var(--lun-border-strong);
+  text-underline-offset: 3px;
+}
+
+.prose a:hover {
+  color: var(--lun-cream);
+}
+
+.prose blockquote {
+  border-left: 2px solid var(--lun-border-strong);
+  color: var(--lun-text-secondary);
+  font-style: italic;
+}
+
+.prose code {
+  color: var(--lun-gold);
+  background: rgba(212, 175, 55, 0.08);
+}

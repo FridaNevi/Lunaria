@@ -1,0 +1,80 @@
+/* ==========================================================================
+   Lunaria — messages.css
+   Los dos tipos de mensaje del Observatorio: la respuesta de Lunaria
+   (oscura, con borde dorado tenue, avatar lunar) y el mensaje de quien
+   pregunta (violeta lunar, nunca el azul clasico de chatbot).
+   ========================================================================== */
+
+/* Mensaje de Lunaria (IA) */
+.ai-message {
+  animation: lun-fade-in var(--lun-transition-slow);
+}
+
+.ai-message .message-content {
+  background: var(--lun-card);
+  border: 1px solid var(--lun-border);
+  border-radius: var(--lun-radius-chat);
+  padding: 1.1rem 1.4rem;
+  box-shadow: var(--lun-shadow-soft);
+}
+
+.ai-message .message-content .prose {
+  color: var(--lun-text);
+}
+
+/* Avatar lunar: circular, con un resplandor muy suave.
+   No se limita a .ai-message: mientras Lunaria "piensa" el avatar se
+   pinta antes de que el mensaje tenga esa clase, y sin esta regla se
+   veia un circulo blanco sin estilo por un instante. Con fondo propio
+   y anillo dorado, se ve bien desde el primer frame. */
+span.relative.flex.shrink-0.overflow-hidden.rounded-full {
+  background: var(--lun-bg-secondary);
+  box-shadow: 0 0 0 1px var(--lun-border), var(--lun-glow-gold);
+  animation: lun-fade-in var(--lun-transition);
+}
+
+.ai-message span.relative.flex.shrink-0.overflow-hidden.rounded-full {
+  height: 1.75rem;
+  width: 1.75rem;
+}
+
+span.relative.flex.shrink-0.overflow-hidden.rounded-full img {
+  background: var(--lun-bg-secondary);
+}
+
+/* Mensaje de quien pregunta: violeta lunar, nunca azul de chatbot */
+div.bg-accent.rounded-3xl.flex-grow-0 {
+  background: linear-gradient(155deg, var(--lun-primary) 0%, var(--lun-primary-hover) 140%);
+  border-radius: var(--lun-radius-chat);
+  color: var(--lun-cream);
+  box-shadow: var(--lun-shadow-soft);
+  animation: lun-fade-in var(--lun-transition-slow);
+}
+
+div.bg-accent.rounded-3xl.flex-grow-0 .message-content,
+div.bg-accent.rounded-3xl.flex-grow-0 .prose {
+  color: var(--lun-cream);
+}
+
+/* Cursor de "Lunaria esta escribiendo": en vez del parpadeo por defecto,
+   un pulso suave a juego con el resto del Observatorio */
+.loading-cursor {
+  color: var(--lun-gold);
+  animation: lun-pulse-soft 1.1s ease-in-out infinite;
+}
+
+/* Chip de referencia inline (cuando Lunaria cita el titulo de una
+   recomendacion que abrio en el panel lateral) */
+.element-link {
+  background: rgba(212, 175, 55, 0.14);
+  color: var(--lun-gold);
+  border: 1px solid var(--lun-border);
+  font-family: var(--lun-font-sans);
+  letter-spacing: 0.03em;
+  transition: background var(--lun-transition), color var(--lun-transition);
+}
+
+.element-link:hover {
+  background: rgba(212, 175, 55, 0.24);
+  color: var(--lun-cream);
+}

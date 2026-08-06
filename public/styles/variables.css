@@ -1,0 +1,56 @@
+/* ==========================================================================
+   Lunaria — variables.css
+   Paleta, tipografia, radios, sombras y transiciones del Observatorio.
+   Todo lo demas en styles/ deberia leer de aqui en vez de usar valores
+   sueltos, para que cambiar un color no signifique buscar en 16 archivos.
+   ========================================================================== */
+
+:root {
+  /* Color: fondo y superficies */
+  --lun-bg-primary: #0b132b;
+  --lun-bg-secondary: #121a34;
+  --lun-surface: #171f3a;
+  --lun-card: #1c2344;
+  --lun-card-hover: #252d53;
+
+  /* Color: marca */
+  --lun-primary: #6d5acf;
+  --lun-primary-hover: #806de8;
+  --lun-gold: #d4af37;
+  --lun-cream: #f3e7d3;
+
+  /* Color: texto */
+  --lun-text: #f7f3ea;
+  --lun-text-secondary: #b6b0d8;
+  --lun-muted: #6b6f88;
+
+  /* Color: estado */
+  --lun-success: #7fcf8a;
+  --lun-warning: #e2b75a;
+  --lun-danger: #d87878;
+
+  /* Bordes: siempre dorado, casi siempre muy tenue */
+  --lun-border: rgba(212, 175, 55, 0.25);
+  --lun-border-soft: rgba(212, 175, 55, 0.12);
+  --lun-border-strong: rgba(212, 175, 55, 0.45);
+
+  /* Tipografia */
+  --lun-font-serif: "Cormorant Garamond", "Playfair Display", serif;
+  --lun-font-sans: "Inter", sans-serif;
+
+  /* Radios por componente (ver seccion "Esquinas" del SDD) */
+  --lun-radius-chat: 18px;
+  --lun-radius-card: 20px;
+  --lun-radius-input: 16px;
+  --lun-radius-btn: 14px;
+
+  /* Sombras: siempre en capas, nunca negro puro */
+  --lun-shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--lun-border-soft);
+  --lun-shadow-lifted: 0 18px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--lun-border-soft);
+  --lun-glow-primary: 0 0 24px rgba(109, 90, 207, 0.35);
+  --lun-glow-gold: 0 0 18px rgba(212, 175, 55, 0.25);
+
+  /* Movimiento */
+  --lun-transition: 250ms ease-out;
+  --lun-transition-slow: 400ms ease-out;
+}
